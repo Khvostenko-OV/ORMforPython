@@ -51,6 +51,7 @@ while pub != "":
             elif st.shop.name not in pub_shop[st.book.publisher.name]:
                 pub_shop[st.book.publisher.name].append(st.shop.name)
         for p in pub_shop:
-            print(f"Издатель '{p}' представлен в магазинах {pub_shop[p]}")
+            print(f"Издатель '{p}' представлен в магазинах: ", end="")
+            print(*pub_shop.get(p), sep=", ")
 
 session.close()
