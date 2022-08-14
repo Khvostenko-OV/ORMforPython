@@ -32,20 +32,25 @@ while pub != "":
     pub = input("Введите издателя: ")
     if pub == "":
         break
-    shops = session.query(Shop).join(Shop.stock, Stock.book, Book.publisher).filter(Publisher.name.ilike(f"%{pub}%")).all()
-    # select sh.name from shop sh
-    #   join stock st
-    #   on sh.id = st.id_shop
-    #   join book b
-    #   on st.id_book = b.id
-    #   join publisher p
-    #   on b.id_publisher = p.id
-    #   where p.name ilike '%{pub}%';
-    if len(shops) == 0:
+    stocks = session.query(Stock).join(Shop.stock, Stock.book, Book.publisher).filter(Publisher.name.ilike(f"%{pub}%")).all()
+    #   select sh.name from stock st
+    #       join shop sh
+    #       on st.id_shop = sh.id
+    #       join book b
+    #       on st.id_book = b.id
+    #       join publisher p
+    #       on b.id_publisher = p.id
+    #       where p.name ilike '%{pub}%';
+    if len(stocks) == 0:
         print(f"Издатель '{pub}' в торговой сети не найден")
     else:
-        print(f"Издатель '{pub}' представлен в магазинах:")
-        for sh in shops:
-            print(sh.name)
+        pub_shop = {}
+        for st in stocks:
+            if st.book.publisher.name not in pub_shop:
+                pub_shop[st.book.publisher.name] = [st.shop.name]
+            elif st.shop.name not in pub_shop[st.book.publisher.name]:
+                pub_shop[st.book.publisher.name].append(st.shop.name)
+        for p in pub_shop:
+            print(f"Издатель '{p}' представлен в магазинах {pub_shop[p]}")
 
 session.close()
